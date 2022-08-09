@@ -29,7 +29,7 @@ const createToken= async (user, statusCode,res) => {
 
     res.cookie('jwt',token,cookiesOptions)
     user.password =  undefined
-    user.loggedOut = undefined
+    // user.loggedOut = undefined
     res.status(statusCode).json({
         status: 'success',
         token,
@@ -58,7 +58,7 @@ exports.login = catchAsync(async(req,res,next) => {
     }
 
     const user = await User.findOne({email: value.email}).select('+password')
-    if(!user || !user.correctPassword(value.password, user.password)){
+    if(!user || ! await user.correctPassword(value.password, user.password)){
         return next(new AppError('incorrect password or username', 401))
     }
     createToken(user, 200, res)
@@ -79,7 +79,7 @@ exports.protect = catchAsync(async(req,res,next) => {
     if(!currentUser){
         return next(new AppError('The user belonging to this token, no longer exist',401))
     }
-    
+    console.log(currentUser)
     if(currentUser.loggedOut){
         return next( new AppError('You are not logged in, Please login to have access', 401))
     }
@@ -158,11 +158,10 @@ exports.resetPassword = catchAsync(async (req,res,next)=>{
 
 exports.logggedout = catchAsync(async (req,res,next) => {
     res.cookie('jwt','', {maxAge:1})
-    const user = await User.findById(req.user._id)
-    user.loggedOut = true
-
-    await user.save({validateBeforeSave:false})
-
+    const user = await User.findByIdAndUpdate(req.user._id,req.body, {
+        new: true,
+        runValidators: true
+    })
     res.status(200).json({
         status: 'successful',
         message: "You have log out succefully"

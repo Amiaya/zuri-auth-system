@@ -48,7 +48,7 @@ exports.manager = catchAsync(async(req,res,next)=>{
 
     res.status(200).json({
         status: "successful",
-        message: "staff endpoint"
+        message: "manager endpoint"
     })
 })
 

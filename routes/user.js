@@ -8,7 +8,7 @@ router.post('/login', authController.login)
 router.post('/forgetPassword', authController.forgetPassword)
 router.patch('/resetPassword/:token', authController.resetPassword)
 
-router.get('/logout', authController.protect, authController.logggedout)
+router.post('/logout', authController.protect, authController.logggedout)
 
 router.route('/updateRole/:id').patch(authController.protect,authController.restrictTo('admin'), userController.updateRole)
 router.route('/AllUser').get(authController.protect,authController.restrictTo('admin'), userController.getAllUser)
